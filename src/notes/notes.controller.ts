@@ -8,8 +8,8 @@ import {
   Delete,
   Param,
 } from '@nestjs/common';
-import { NoteDto } from 'src/dto/note.dto';
-import { Note } from 'src/notes/note.entity';
+import { NoteDto } from 'src/notes/dto/note.dto';
+import { Note } from 'src/notes/entity/note.entity';
 import { NotesService } from './notes.service';
 
 @Controller('notes')
