@@ -9,20 +9,25 @@ import {
   Param,
   ParseIntPipe,
 } from '@nestjs/common';
-import { NoteDto } from 'src/notes/dto/note.dto';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { CreateNoteDto, UpdateNoteDto } from 'src/notes/dto/note.dto';
 import { Note } from 'src/notes/entity/note.entity';
 import { NotesService } from './notes.service';
 
+@ApiTags('Notes')
+@ApiBearerAuth()
 @Controller('notes')
 export class NotesController {
   constructor(private notesService: NotesService) {}
 
-  // Save a new note
+  @ApiOperation({
+    description: 'Save a new note',
+  })
   @Post()
-  async create(@Request() req, @Body() noteDto: NoteDto) {
+  async create(@Request() req, @Body() createNote: CreateNoteDto) {
     const note: any = {
-      title: noteDto.title,
-      body: noteDto.body,
+      title: createNote.title,
+      body: createNote.body,
       status: true,
       user: req.user,
     };
@@ -30,23 +35,29 @@ export class NotesController {
     return this.notesService.createNote(note as Note);
   }
 
-  // Update a previously saved note
+  @ApiOperation({
+    description: 'Update a previously saved note',
+  })
   @Patch(':noteId')
   async update(
     @Request() req,
     @Param('noteId', ParseIntPipe) noteId: number,
-    @Body() noteDto: NoteDto,
+    @Body() updateNote: UpdateNoteDto,
   ) {
-    return this.notesService.updateNote(noteId, noteDto as Note);
+    return this.notesService.updateNote(noteId, updateNote as Note);
   }
 
-  // Delete a saved note
+  @ApiOperation({
+    description: 'Delete a saved note',
+  })
   @Delete(':noteId')
   async delete(@Request() req, @Param('noteId', ParseIntPipe) noteId: number) {
     return this.notesService.deleteNote(noteId);
   }
 
-  // Archive a note
+  @ApiOperation({
+    description: 'Archive a note',
+  })
   @Patch(':noteId/archive')
   async archive(@Request() req, @Param('noteId', ParseIntPipe) noteId: number) {
     return this.notesService.updateNote(noteId, {
@@ -54,7 +65,9 @@ export class NotesController {
     } as Note);
   }
 
-  // Unarchive a previously archived note
+  @ApiOperation({
+    description: 'Unarchive a previously archived note',
+  })
   @Patch(':noteId/unarchive')
   async unarchive(
     @Request() req,
@@ -65,13 +78,17 @@ export class NotesController {
     } as Note);
   }
 
-  // List saved notes that aren't archived
+  @ApiOperation({
+    description: "List saved notes that aren't archived",
+  })
   @Get()
   async getActiveNotes(@Request() req) {
     return this.notesService.getActiveNotes(req.user.userId);
   }
 
-  // List notes that are archived
+  @ApiOperation({
+    description: 'List notes that are archived',
+  })
   @Get('archived')
   async getArchivedNotes(@Request() req) {
     return this.notesService.getArchivedNotes(req.user.userId);
