@@ -9,10 +9,11 @@ export class NotesService {
     @InjectRepository(Note) private noteRepository: Repository<Note>,
   ) {}
 
-  getNoteById = (noteId: number): Promise<Note> => {
+  getNoteById = (userId: number, noteId: number): Promise<Note> => {
     return this.noteRepository.findOne({
       where: {
         noteId,
+        user: userId,
       },
     });
   };
@@ -32,8 +33,8 @@ export class NotesService {
   getNotesByStatus = (userId: number, status: number): Promise<Note[]> => {
     return this.noteRepository.find({
       where: {
-        user: userId,
         status,
+        user: userId,
       },
     });
   };

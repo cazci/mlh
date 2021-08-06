@@ -18,7 +18,9 @@ export class Note {
   @Column()
   body: string;
 
-  @Column()
+  @Column({
+    select: false,
+  })
   status: number;
 
   @ManyToOne(() => User, (user) => user.notes)

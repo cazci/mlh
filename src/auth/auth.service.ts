@@ -23,9 +23,8 @@ export class AuthService {
     pass: string,
   ): Promise<Partial<User> | null> => {
     const user = await this.usersService.findByUsername(username);
-    const isMatch = await compare(pass, user.password);
 
-    if (user && isMatch) {
+    if (user && (await compare(pass, user.password))) {
       delete user.password;
       return user;
     }

@@ -73,9 +73,9 @@ export class NotesController {
     @Param('noteId', ParseIntPipe) noteId: number,
     @Body() updateNote: UpdateNoteDto,
   ): Promise<ApiResponse> {
-    const note = await this.notesService.getNoteById(noteId);
+    const note = await this.notesService.getNoteById(req.user.userId, noteId);
 
-    if (req.user.userId !== note.user.userId) {
+    if (!note) {
       throw new HttpException(
         "User doesn't have permission to edit this note",
         HttpStatus.FORBIDDEN,
@@ -112,9 +112,9 @@ export class NotesController {
     @Request() req,
     @Param('noteId', ParseIntPipe) noteId: number,
   ): Promise<ApiResponse> {
-    const note = await this.notesService.getNoteById(noteId);
+    const note = await this.notesService.getNoteById(req.user.userId, noteId);
 
-    if (req.user.userId !== note.user.userId) {
+    if (!note) {
       throw new HttpException(
         "User doesn't have permission to edit this note",
         HttpStatus.FORBIDDEN,
@@ -148,9 +148,9 @@ export class NotesController {
     @Request() req,
     @Param('noteId', ParseIntPipe) noteId: number,
   ): Promise<ApiResponse> {
-    const note = await this.notesService.getNoteById(noteId);
+    const note = await this.notesService.getNoteById(req.user.userId, noteId);
 
-    if (req.user.userId !== note.user.userId) {
+    if (!note) {
       throw new HttpException(
         "User doesn't have permission to archive this note",
         HttpStatus.FORBIDDEN,
@@ -186,9 +186,9 @@ export class NotesController {
     @Request() req,
     @Param('noteId', ParseIntPipe) noteId: number,
   ): Promise<ApiResponse> {
-    const note = await this.notesService.getNoteById(noteId);
+    const note = await this.notesService.getNoteById(req.user.userId, noteId);
 
-    if (req.user.userId !== note.user.userId) {
+    if (!note) {
       throw new HttpException(
         "User doesn't have permission to unarchive this note",
         HttpStatus.FORBIDDEN,
