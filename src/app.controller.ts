@@ -7,10 +7,13 @@ import { AuthRoute } from './auth/decorators/auth.decorator';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
+  /**
+   * @returns {string}
+   */
   @ApiExcludeEndpoint()
   @AuthRoute()
   @Get()
-  async sayHello() {
+  async sayHello(): Promise<string> {
     return this.appService.sayHello();
   }
 }

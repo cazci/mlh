@@ -25,6 +25,10 @@ import { NoteStatus } from './models/note-status';
 export class NotesController {
   constructor(private notesService: NotesService) {}
 
+  /**
+   * @param createNote New note to create
+   * @returns {ApiResponse}
+   */
   @ApiOperation({
     description: 'Save a new note',
   })
@@ -55,6 +59,11 @@ export class NotesController {
     };
   }
 
+  /**
+   * @param noteId Note id to update
+   * @param updateNote Partial note to update
+   * @returns {ApiResponse}
+   */
   @ApiOperation({
     description: 'Update a previously saved note',
   })
@@ -91,6 +100,10 @@ export class NotesController {
     };
   }
 
+  /**
+   * @param noteId Note id to delete
+   * @returns {ApiResponse}
+   */
   @ApiOperation({
     description: 'Delete a saved note',
   })
@@ -123,6 +136,10 @@ export class NotesController {
     };
   }
 
+  /**
+   * @param noteId Note id to archive
+   * @returns {ApiResponse}
+   */
   @ApiOperation({
     description: 'Archive a note',
   })
@@ -157,6 +174,10 @@ export class NotesController {
     };
   }
 
+  /**
+   * @param noteId Note id to unarchive
+   * @returns {ApiResponse}
+   */
   @ApiOperation({
     description: 'Unarchive a previously archived note',
   })
@@ -191,6 +212,9 @@ export class NotesController {
     };
   }
 
+  /**
+   * @returns {ApiResponse<Note[]>}
+   */
   @ApiOperation({
     description: "List saved notes that aren't archived",
   })
@@ -215,6 +239,9 @@ export class NotesController {
     };
   }
 
+  /**
+   * @returns {ApiResponse<Note[]>}
+   */
   @ApiOperation({
     description: 'List notes that are archived',
   })

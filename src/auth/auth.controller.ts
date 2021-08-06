@@ -18,6 +18,11 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  /**
+   * @param username Valid username
+   * @param password Valid password
+   * @returns {AuthResponse}
+   */
   @ApiOperation({
     description: 'Login with valid username and password',
   })
@@ -29,6 +34,10 @@ export class AuthController {
     return this.authService.login(req.user);
   }
 
+  /**
+   * @param registerUser New user to register
+   * @returns {AuthResponse}
+   */
   @ApiOperation({
     description: 'Register as a new user',
   })

@@ -5,6 +5,9 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 @ApiBearerAuth()
 @Controller('users')
 export class UsersController {
+  /**
+   * @returns {Partial<User>}
+   */
   @ApiOperation({
     description: 'Get current user info',
   })
