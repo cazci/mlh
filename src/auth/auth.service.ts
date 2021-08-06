@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UserDto } from 'src/dto/user.dto';
 import { User } from 'src/users/user.entity';
 import { UsersService } from 'src/users/users.service';
+import { compare, hash } from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -13,8 +14,9 @@ export class AuthService {
 
   validateUser = async (username: string, pass: string): Promise<any> => {
     const user = await this.usersService.findByUsername(username);
+    const isMatch = await compare(pass, user.password);
 
-    if (user && user.password === pass) {
+    if (user && isMatch) {
       const { password, ...result } = user;
       return result;
     }
@@ -29,7 +31,6 @@ export class AuthService {
     };
   };
 
-  // TODO: Use bcrypt and hash the password when storing
   register = async (user: UserDto) => {
     const currentUserRecord = await this.usersService.findByUsername(
       user.username,
@@ -39,7 +40,14 @@ export class AuthService {
       throw new ConflictException('User already exists');
     }
 
-    const result = await this.usersService.registerUser(user as User);
+    const userWithHashedPassword: UserDto = {
+      username: user.username,
+      password: await hash(user.password, 10),
+    };
+
+    const result = await this.usersService.registerUser(
+      userWithHashedPassword as User,
+    );
 
     if (!result.identifiers) {
       return 'failed';
