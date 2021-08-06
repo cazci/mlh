@@ -5,7 +5,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
-import { mysqlConfig } from './config/config';
+import { config } from './config/config';
 import { UsersModule } from './users/users.module';
 import { NotesModule } from './notes/notes.module';
 
@@ -13,7 +13,7 @@ import { NotesModule } from './notes/notes.module';
   imports: [
     AuthModule,
     UsersModule,
-    TypeOrmModule.forRoot(mysqlConfig as TypeOrmModuleOptions),
+    TypeOrmModule.forRoot(config.mysql as TypeOrmModuleOptions),
     NotesModule,
   ],
   controllers: [AppController],
