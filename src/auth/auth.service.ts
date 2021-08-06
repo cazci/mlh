@@ -1,7 +1,7 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { RegisterUserDto } from 'src/dto/register-user.dto';
-import { User } from 'src/entities/user.entity';
+import { UserDto } from 'src/dto/user.dto';
+import { User } from 'src/users/user.entity';
 import { UsersService } from 'src/users/users.service';
 
 @Injectable()
@@ -30,7 +30,7 @@ export class AuthService {
   };
 
   // TODO: Use bcrypt and hash the password when storing
-  register = async (user: RegisterUserDto) => {
+  register = async (user: UserDto) => {
     const currentUserRecord = await this.usersService.findByUsername(
       user.username,
     );

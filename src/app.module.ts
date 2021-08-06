@@ -14,6 +14,7 @@ import { NotesModule } from './notes/notes.module';
     AuthModule,
     UsersModule,
     TypeOrmModule.forRoot(mysqlConfig as TypeOrmModuleOptions),
+    NotesModule,
   ],
   controllers: [AppController],
   providers: [
