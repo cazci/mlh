@@ -39,3 +39,6 @@ task
 
 # Config
 src/config/config.ts
+
+# Docs
+/documentation
