@@ -7,6 +7,7 @@ import {
   Patch,
   Delete,
   Param,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { NoteDto } from 'src/notes/dto/note.dto';
 import { Note } from 'src/notes/entity/note.entity';
@@ -31,28 +32,35 @@ export class NotesController {
 
   // Update a previously saved note
   @Patch(':noteId')
-  async update(@Request() req, @Param() params, @Body() noteDto: NoteDto) {
-    return this.notesService.updateNote(params.noteId, noteDto as Note);
+  async update(
+    @Request() req,
+    @Param('noteId', ParseIntPipe) noteId: number,
+    @Body() noteDto: NoteDto,
+  ) {
+    return this.notesService.updateNote(noteId, noteDto as Note);
   }
 
   // Delete a saved note
   @Delete(':noteId')
-  async delete(@Request() req, @Param() params) {
-    return this.notesService.deleteNote(params.noteId);
+  async delete(@Request() req, @Param('noteId', ParseIntPipe) noteId: number) {
+    return this.notesService.deleteNote(noteId);
   }
 
   // Archive a note
   @Patch(':noteId/archive')
-  async archive(@Request() req, @Param() params) {
-    return this.notesService.updateNote(params.noteId, {
+  async archive(@Request() req, @Param('noteId', ParseIntPipe) noteId: number) {
+    return this.notesService.updateNote(noteId, {
       status: false,
     } as Note);
   }
 
   // Unarchive a previously archived note
   @Patch(':noteId/unarchive')
-  async unarchive(@Request() req, @Param() params) {
-    return this.notesService.updateNote(params.noteId, {
+  async unarchive(
+    @Request() req,
+    @Param('noteId', ParseIntPipe) noteId: number,
+  ) {
+    return this.notesService.updateNote(noteId, {
       status: true,
     } as Note);
   }
