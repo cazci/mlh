@@ -8,12 +8,16 @@ import {
   Delete,
   Param,
   ParseIntPipe,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateNoteDto } from 'src/notes/dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
-import { Note } from 'src/notes/entity/note.entity';
+import { Note } from 'src/notes/entities/note.entity';
 import { NotesService } from './notes.service';
+import { ApiResponse } from 'src/dto/api-response.dto';
+import { NoteStatus } from './models/note-status';
 
 @ApiTags('Notes')
 @ApiBearerAuth()
@@ -25,15 +29,30 @@ export class NotesController {
     description: 'Save a new note',
   })
   @Post()
-  async create(@Request() req, @Body() createNote: CreateNoteDto) {
-    const note: any = {
+  async create(
+    @Request() req,
+    @Body() createNote: CreateNoteDto,
+  ): Promise<ApiResponse> {
+    const note: Partial<Note> = {
       title: createNote.title,
       body: createNote.body,
-      status: true,
+      status: NoteStatus.ACTIVE,
       user: req.user,
     };
 
-    return this.notesService.createNote(note as Note);
+    const result = await this.notesService.createNote(note as Note);
+
+    if (!result.identifiers) {
+      throw new HttpException(
+        'Failed to register the user',
+        HttpStatus.EXPECTATION_FAILED,
+      );
+    }
+
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'Successfully created a note',
+    };
   }
 
   @ApiOperation({
@@ -44,26 +63,98 @@ export class NotesController {
     @Request() req,
     @Param('noteId', ParseIntPipe) noteId: number,
     @Body() updateNote: UpdateNoteDto,
-  ) {
-    return this.notesService.updateNote(noteId, updateNote as Note);
+  ): Promise<ApiResponse> {
+    const note = await this.notesService.getNoteById(noteId);
+
+    if (req.user.userId !== note.user.userId) {
+      throw new HttpException(
+        "User doesn't have permission to edit this note",
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    const result = await this.notesService.updateNote(
+      noteId,
+      updateNote as Note,
+    );
+
+    if (!result.affected) {
+      throw new HttpException(
+        'Failed to update the note',
+        HttpStatus.EXPECTATION_FAILED,
+      );
+    }
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Successfully updated the note',
+    };
   }
 
   @ApiOperation({
     description: 'Delete a saved note',
   })
   @Delete(':noteId')
-  async delete(@Request() req, @Param('noteId', ParseIntPipe) noteId: number) {
-    return this.notesService.deleteNote(noteId);
+  async delete(
+    @Request() req,
+    @Param('noteId', ParseIntPipe) noteId: number,
+  ): Promise<ApiResponse> {
+    const note = await this.notesService.getNoteById(noteId);
+
+    if (req.user.userId !== note.user.userId) {
+      throw new HttpException(
+        "User doesn't have permission to edit this note",
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    const result = await this.notesService.deleteNote(noteId);
+
+    if (!result.affected) {
+      throw new HttpException(
+        'Failed to delete the note',
+        HttpStatus.EXPECTATION_FAILED,
+      );
+    }
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Successfully deleted the note',
+    };
   }
 
   @ApiOperation({
     description: 'Archive a note',
   })
   @Patch(':noteId/archive')
-  async archive(@Request() req, @Param('noteId', ParseIntPipe) noteId: number) {
-    return this.notesService.updateNote(noteId, {
-      status: false,
+  async archive(
+    @Request() req,
+    @Param('noteId', ParseIntPipe) noteId: number,
+  ): Promise<ApiResponse> {
+    const note = await this.notesService.getNoteById(noteId);
+
+    if (req.user.userId !== note.user.userId) {
+      throw new HttpException(
+        "User doesn't have permission to archive this note",
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    const result = await this.notesService.updateNote(noteId, {
+      status: NoteStatus.ARCHIVED,
     } as Note);
+
+    if (!result.affected) {
+      throw new HttpException(
+        'Failed to archive the note',
+        HttpStatus.EXPECTATION_FAILED,
+      );
+    }
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Successfully archived the note',
+    };
   }
 
   @ApiOperation({
@@ -73,25 +164,78 @@ export class NotesController {
   async unarchive(
     @Request() req,
     @Param('noteId', ParseIntPipe) noteId: number,
-  ) {
-    return this.notesService.updateNote(noteId, {
-      status: true,
+  ): Promise<ApiResponse> {
+    const note = await this.notesService.getNoteById(noteId);
+
+    if (req.user.userId !== note.user.userId) {
+      throw new HttpException(
+        "User doesn't have permission to unarchive this note",
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
+    const result = await this.notesService.updateNote(noteId, {
+      status: NoteStatus.ACTIVE,
     } as Note);
+
+    if (!result.affected) {
+      throw new HttpException(
+        'Failed to unarchive the note',
+        HttpStatus.EXPECTATION_FAILED,
+      );
+    }
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Successfully unarchived the note',
+    };
   }
 
   @ApiOperation({
     description: "List saved notes that aren't archived",
   })
   @Get()
-  async getActiveNotes(@Request() req) {
-    return this.notesService.getActiveNotes(req.user.userId);
+  async getActiveNotes(@Request() req): Promise<ApiResponse<Note[]>> {
+    const result = await this.notesService.getNotesByStatus(
+      req.user.userId,
+      NoteStatus.ACTIVE,
+    );
+
+    if (!result) {
+      throw new HttpException(
+        'Failed to get the active notes',
+        HttpStatus.EXPECTATION_FAILED,
+      );
+    }
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Success',
+      payload: result,
+    };
   }
 
   @ApiOperation({
     description: 'List notes that are archived',
   })
   @Get('archived')
-  async getArchivedNotes(@Request() req) {
-    return this.notesService.getArchivedNotes(req.user.userId);
+  async getArchivedNotes(@Request() req): Promise<ApiResponse<Note[]>> {
+    const result = await this.notesService.getNotesByStatus(
+      req.user.userId,
+      NoteStatus.ARCHIVED,
+    );
+
+    if (!result) {
+      throw new HttpException(
+        'Failed to get the archived notes',
+        HttpStatus.EXPECTATION_FAILED,
+      );
+    }
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: 'Success',
+      payload: result,
+    };
   }
 }

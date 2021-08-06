@@ -5,7 +5,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { User } from '../../users/entity/user.entity';
+import { User } from '../../users/entities/user.entity';
 
 @Entity()
 export class Note {
@@ -19,7 +19,7 @@ export class Note {
   body: string;
 
   @Column()
-  status: boolean;
+  status: number;
 
   @ManyToOne(() => User, (user) => user.notes)
   @JoinColumn()

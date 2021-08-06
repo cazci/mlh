@@ -1,9 +1,15 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterUserDto } from 'src/users/dto/register-user.dto';
-import { User } from 'src/users/entity/user.entity';
+import { User } from 'src/users/entities/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { compare, hash } from 'bcrypt';
+import { AuthResponse } from './dto/auth-response.dto';
 
 @Injectable()
 export class AuthService {
@@ -12,26 +18,31 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  validateUser = async (username: string, pass: string): Promise<any> => {
+  validateUser = async (
+    username: string,
+    pass: string,
+  ): Promise<Partial<User> | null> => {
     const user = await this.usersService.findByUsername(username);
     const isMatch = await compare(pass, user.password);
 
     if (user && isMatch) {
-      const { password, ...result } = user;
-      return result;
+      delete user.password;
+      return user;
     }
 
     return null;
   };
 
-  login = (user: any) => {
+  login = (user: Partial<User>): AuthResponse => {
     const payload = { username: user.username, sub: user.userId };
     return {
-      access_token: this.jwtService.sign(payload),
+      statusCode: HttpStatus.OK,
+      message: 'success',
+      accessToken: this.jwtService.sign(payload),
     };
   };
 
-  register = async (registerUser: RegisterUserDto) => {
+  register = async (registerUser: RegisterUserDto): Promise<AuthResponse> => {
     const currentUserRecord = await this.usersService.findByUsername(
       registerUser.username,
     );
@@ -45,14 +56,26 @@ export class AuthService {
       password: await hash(registerUser.password, 10),
     };
 
-    const result = await this.usersService.registerUser(
+    const result = await this.usersService.createUser(
       userWithHashedPassword as User,
     );
 
     if (!result.identifiers) {
-      return 'failed';
+      throw new HttpException(
+        'Failed to register the user',
+        HttpStatus.EXPECTATION_FAILED,
+      );
     }
 
-    return 'success';
+    const payload = {
+      username: registerUser.username,
+      sub: result.identifiers[0].userId,
+    };
+
+    return {
+      statusCode: HttpStatus.CREATED,
+      message: 'User successfully registered',
+      accessToken: this.jwtService.sign(payload),
+    };
   };
 }
