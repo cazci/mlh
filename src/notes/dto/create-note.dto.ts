@@ -10,5 +10,3 @@ export class CreateNoteDto {
   @IsString()
   body: string;
 }
-
-export class UpdateNoteDto extends PartialType(CreateNoteDto) {}

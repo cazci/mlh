@@ -10,7 +10,8 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { CreateNoteDto, UpdateNoteDto } from 'src/notes/dto/note.dto';
+import { CreateNoteDto } from 'src/notes/dto/create-note.dto';
+import { UpdateNoteDto } from './dto/update-note.dto';
 import { Note } from 'src/notes/entity/note.entity';
 import { NotesService } from './notes.service';
 
