@@ -146,7 +146,7 @@ Run the following command to run the e2e tests
    ```
 ## Tech And Reasons
 
-**NestJS** - NestJS is a moders javascript framework for building efficient, scalable Node.js web applications. It has in-built support for popular JS libraries like express.js, rxjs, typeorm, and mongoose. Moreover, it combines elements for OOP, FP and FRP and allows to code in Typescript. 
+**NestJS** - NestJS is a modern javascript framework for building efficient, scalable Node.js web applications. It has in-built support for popular JS libraries like express.js, rxjs, typeorm, and mongoose. Moreover, it combines the elements of OOP, FP and FRP and allows to code in Typescript. 
 
 _Alternatives_
 * Spring Boot
