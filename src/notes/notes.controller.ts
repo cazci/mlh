@@ -12,11 +12,11 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { CreateNoteDto } from 'src/notes/dto/create-note.dto';
+import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
-import { Note } from 'src/notes/entities/note.entity';
+import { Note } from './entities/note.entity';
 import { NotesService } from './notes.service';
-import { ApiResponse } from 'src/dto/api-response.dto';
+import { ApiResponse } from '../dto/api-response.dto';
 import { NoteStatus } from './models/note-status';
 
 @ApiTags('Notes')

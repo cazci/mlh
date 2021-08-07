@@ -7,8 +7,8 @@ import {
   HttpCode,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { AuthRoute } from 'src/auth/decorators/auth.decorator';
-import { RegisterUserDto } from 'src/users/dto/register-user.dto';
+import { AuthRoute } from './decorators/auth.decorator';
+import { RegisterUserDto } from '../users/dto/register-user.dto';
 import { AuthService } from './auth.service';
 import { AuthResponse } from './dto/auth-response.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
