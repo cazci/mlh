@@ -13,7 +13,7 @@ export class AppController {
   @ApiExcludeEndpoint()
   @AuthRoute()
   @Get()
-  async sayHello(): Promise<string> {
+  sayHello(): string {
     return this.appService.sayHello();
   }
 }
